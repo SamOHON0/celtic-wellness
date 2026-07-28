@@ -11,6 +11,7 @@ const SHOP_LINKS = [
 ];
 
 const HELP_LINKS = [
+  { label: "My Account", href: `${WOO_URL}/my-account/` },
   { label: "Contact Us", href: `${WOO_URL}/contact/` },
   { label: "Delivery Information", href: `${WOO_URL}/delivery-information/` },
   { label: "Returns Policy", href: `${WOO_URL}/refund-returns/` },

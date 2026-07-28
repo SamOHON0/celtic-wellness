@@ -4,8 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { List, X, Tote } from "@phosphor-icons/react";
+import { List, X, Tote, User } from "@phosphor-icons/react";
 import { useCart } from "./cart";
+import { WOO_URL } from "@/lib/config";
 
 const NAV = [
   { label: "Shop All", href: "/shop" },
@@ -54,6 +55,13 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <a
+            href={`${WOO_URL}/my-account/`}
+            aria-label="My account"
+            className="hidden rounded-full p-2.5 transition-colors hover:bg-bone-200 sm:block"
+          >
+            <User size={22} />
+          </a>
           <button
             onClick={cart.open}
             aria-label="Open cart"
@@ -88,6 +96,12 @@ export function Header() {
               {item.label}
             </Link>
           ))}
+          <a
+            href={`${WOO_URL}/my-account/`}
+            className="block rounded-lg px-2 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-bone-100"
+          >
+            My Account
+          </a>
         </nav>
       )}
     </header>
