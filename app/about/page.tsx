@@ -41,12 +41,30 @@ const STANDARDS = [
 export default function AboutPage() {
   return (
     <>
-      {/* Story hero */}
-      <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:gap-20">
-        <div>
-          <h1 className="text-3xl font-bold leading-tight tracking-tight md:text-5xl">
+      {/* Full-bleed hero */}
+      <section className="relative flex min-h-[62dvh] items-end">
+        <Image
+          src="https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=2400&q=80"
+          alt="An Atlantic wave breaking off the Irish coast"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-pine-950/85 via-pine-950/30 to-pine-950/20" />
+        <div className="relative mx-auto w-full max-w-7xl px-4 pb-14 pt-32 sm:px-6">
+          <h1 className="hero-enter max-w-2xl text-4xl font-bold leading-[1.05] tracking-tight text-bone-50 md:text-6xl">
             Practical wellness, from Ireland&apos;s Atlantic coast
           </h1>
+        </div>
+      </section>
+
+      {/* Story */}
+      <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-20">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
+            How it started
+          </h2>
           <p className="mt-6 leading-relaxed text-ink-soft">
             Celtic Wellness started in Sligo with a frustration you might
             recognise: a supplement industry full of noise, overclaiming and
