@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  /* Forest palette: deep pine green + bone + amber accent */
+  --color-pine-50: #f1f6f2;
+  --color-pine-100: #dcebe0;
+  --color-pine-200: #b8d6c2;
+  --color-pine-300: #8bba9d;
+  --color-pine-400: #5c9877;
+  --color-pine-500: #3d7c5c;
+  --color-pine-600: #2c6349;
+  --color-pine-700: #234f3b;
+  --color-pine-800: #1c3f30;
+  --color-pine-900: #142e23;
+  --color-pine-950: #0b1f17;
+
+  --color-bone-50: #fbfbf8;
+  --color-bone-100: #f5f5ef;
+  --color-bone-200: #e9e9df;
+  --color-bone-300: #d6d6c8;
+
+  --color-amber-accent: #d99a2b;
+
+  --color-ink: #131b16;
+  --color-ink-soft: #47544c;
+
+  --font-sans: "Outfit Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bone-50);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-pine-200);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
