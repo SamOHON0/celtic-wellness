@@ -4,6 +4,8 @@ import "./globals.css";
 import { CartProvider, CartDrawer } from "@/components/cart";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { JsonLd } from "@/components/json-ld";
+import { organizationSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://celticwellness.ie"),
@@ -28,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <JsonLd data={organizationSchema()} />
         <CartProvider>
           <Header />
           <main>{children}</main>

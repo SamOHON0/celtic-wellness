@@ -100,6 +100,14 @@ export function Footer() {
                   About Us
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/blog"
+                  className="text-sm text-bone-300 transition-colors hover:text-bone-50"
+                >
+                  Blog
+                </Link>
+              </li>
               {LEGAL_LINKS.map((l) => (
                 <li key={l.href}>
                   <a

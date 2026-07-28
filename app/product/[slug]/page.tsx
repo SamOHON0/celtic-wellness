@@ -8,6 +8,8 @@ import { formatPrice } from "@/lib/format";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { ProductCard } from "@/components/product-card";
 import { ProductGallery } from "@/components/product-gallery";
+import { JsonLd } from "@/components/json-ld";
+import { productSchema, breadcrumbSchema } from "@/lib/schema";
 
 export const revalidate = 300;
 
@@ -36,8 +38,24 @@ export default async function ProductPage({ params }: Props) {
         .slice(0, 4)
     : [];
 
+  const crumbs = [
+    { name: "Home", path: "/" },
+    { name: "Shop", path: "/shop" },
+    ...(primaryCategory
+      ? [
+          {
+            name: primaryCategory.name,
+            path: `/product-category/${primaryCategory.slug}`,
+          },
+        ]
+      : []),
+    { name: product.name, path: `/product/${product.slug}` },
+  ];
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+      <JsonLd data={productSchema(product)} />
+      <JsonLd data={breadcrumbSchema(crumbs)} />
       <Link
         href="/shop"
         className="inline-flex items-center gap-1.5 text-sm text-ink-soft transition-colors hover:text-pine-700"

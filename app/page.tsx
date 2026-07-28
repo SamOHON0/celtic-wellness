@@ -2,8 +2,31 @@ import Image from "next/image";
 import Link from "next/link";
 import { Truck, Flask, ChatCircleText, Medal } from "@phosphor-icons/react/dist/ssr";
 import { getProducts } from "@/lib/woo";
+import { posts } from "@/lib/posts";
 import { ProductCard } from "@/components/product-card";
 import { Reveal } from "@/components/reveal";
+import { Newsletter } from "@/components/newsletter";
+import { JsonLd } from "@/components/json-ld";
+import { faqSchema } from "@/lib/schema";
+
+const HOME_FAQS = [
+  {
+    q: "How fast is delivery in Ireland?",
+    a: "Orders ship tracked from Sligo and typically arrive within 2 to 3 working days anywhere in Ireland. Delivery is free on orders over €50.",
+  },
+  {
+    q: "Which shilajit format should I start with?",
+    a: "Resin is the traditional format and best value; capsules and gummies are easier to take daily. If you're new to shilajit, capsules are the simplest starting point.",
+  },
+  {
+    q: "Are your products tested?",
+    a: "Yes. We stock products with proven ingredients and lab-tested batches, including purity testing on all shilajit.",
+  },
+  {
+    q: "Do you supply shops and gyms?",
+    a: "We do. Wholesale enquiries are welcome through our wholesale page and we ship trade orders nationwide.",
+  },
+];
 
 export const revalidate = 300;
 
@@ -48,8 +71,11 @@ export default async function HomePage() {
     products.find((p) => p.categories.some((c) => c.slug === slug) && p.images[0])
       ?.images[0]?.src;
 
+  const latestPosts = posts.slice(0, 3);
+
   return (
     <>
+      <JsonLd data={faqSchema(HOME_FAQS)} />
       {/* Hero: asymmetric split */}
       <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pt-16">
         <div>
@@ -265,6 +291,77 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* From the journal */}
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+        <div className="flex items-end justify-between gap-4">
+          <Reveal>
+            <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
+              From the journal
+            </h2>
+          </Reveal>
+          <Link
+            href="/blog"
+            className="text-sm font-semibold text-pine-700 underline-offset-4 hover:underline"
+          >
+            All articles
+          </Link>
+        </div>
+        <div className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-3">
+          {latestPosts.map((post, i) => (
+            <Reveal key={post.slug} delay={i * 60}>
+              <Link href={`/blog/${post.slug}`} className="group block">
+                <div className="relative aspect-[16/11] overflow-hidden rounded-card bg-bone-100">
+                  <Image
+                    src={post.image}
+                    alt={post.title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  />
+                </div>
+                <p className="mt-4 text-sm font-medium text-pine-600">
+                  {post.category}
+                </p>
+                <h3 className="mt-1 font-semibold leading-snug transition-colors group-hover:text-pine-700">
+                  {post.title}
+                </h3>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="bg-bone-100 py-20">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1.6fr]">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
+              Common questions
+            </h2>
+            <p className="mt-3 leading-relaxed text-ink-soft">
+              Can&apos;t find what you need? Our team answers every message.
+            </p>
+          </div>
+          <div className="divide-y divide-bone-300">
+            {HOME_FAQS.map((f) => (
+              <details key={f.q} className="group py-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between font-semibold">
+                  {f.q}
+                  <span className="ml-4 text-pine-600 transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 max-w-2xl leading-relaxed text-ink-soft">
+                  {f.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Newsletter />
     </>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { List, X, Tote } from "@phosphor-icons/react";
@@ -8,10 +9,11 @@ import { useCart } from "./cart";
 
 const NAV = [
   { label: "Shop All", href: "/shop" },
-  { label: "Supplements", href: "/product-category/wellness-supplements" },
   { label: "Shilajit", href: "/product-category/shilajit" },
-  { label: "Water Treatment", href: "/product-category/water-treatment" },
+  { label: "Supplements", href: "/product-category/wellness-supplements" },
+  { label: "Water", href: "/product-category/water-treatment" },
   { label: "Recovery", href: "/product-category/ice-tubs" },
+  { label: "Blog", href: "/blog" },
   { label: "About", href: "/about" },
 ];
 
@@ -26,13 +28,15 @@ export function Header() {
         Free delivery across Ireland on orders over €50
       </div>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-baseline gap-1.5">
-          <span className="text-xl font-bold tracking-tight text-pine-900">
-            Celtic
-          </span>
-          <span className="text-xl font-light tracking-tight text-ink">
-            Wellness
-          </span>
+        <Link href="/" aria-label="Celtic Wellness home">
+          <Image
+            src="/logo.webp"
+            alt="Celtic Wellness"
+            width={176}
+            height={44}
+            priority
+            className="h-9 w-auto sm:h-10"
+          />
         </Link>
 
         <nav className="hidden items-center gap-7 lg:flex">
