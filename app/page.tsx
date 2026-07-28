@@ -32,7 +32,17 @@ const CATEGORY_TILES = [
 
 export default async function HomePage() {
   const products = await getProducts();
-  const featured = products.filter((p) => p.inStock && p.images.length > 0).slice(0, 8);
+  const shilajit = products.filter(
+    (p) => p.categories.some((c) => c.slug === "shilajit") && p.images.length > 0,
+  );
+  const featured = products
+    .filter(
+      (p) =>
+        p.inStock &&
+        p.images.length > 0 &&
+        !p.categories.some((c) => c.slug === "shilajit"),
+    )
+    .slice(0, 8);
 
   const tileImage = (slug: string) =>
     products.find((p) => p.categories.some((c) => c.slug === slug) && p.images[0])
@@ -44,7 +54,7 @@ export default async function HomePage() {
       <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pt-16">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-pine-600">
-            Sligo, Ireland
+            Ireland&apos;s shilajit specialists
           </p>
           <h1 className="mt-4 text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">
             Wellness that
@@ -52,8 +62,8 @@ export default async function HomePage() {
             actually works
           </h1>
           <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-soft">
-            Premium supplements and recovery gear, tested for purity and
-            delivered tracked across Ireland in 2 to 3 days.
+            Lab-tested Himalayan shilajit and premium supplements, delivered
+            tracked across Ireland in 2 to 3 days.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link
@@ -121,6 +131,40 @@ export default async function HomePage() {
               </Reveal>
             );
           })}
+        </div>
+      </section>
+
+      {/* Shilajit range: hero category */}
+      <section className="bg-pine-50 py-20">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1.8fr] lg:gap-14">
+          <Reveal>
+            <div className="lg:sticky lg:top-32">
+              <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
+                The Shilajit range
+              </h2>
+              <p className="mt-4 leading-relaxed text-ink-soft">
+                One ingredient, five ways to take it. Pure Himalayan resin for
+                purists, capsules and gummies for convenience, drops and honey
+                sticks for everything in between. Every batch lab-tested.
+              </p>
+              <Link
+                href="/product-category/shilajit"
+                className="mt-6 inline-block rounded-full bg-pine-800 px-7 py-3 text-sm font-semibold text-bone-50 transition-all hover:bg-pine-700 active:scale-[0.98]"
+              >
+                Shop all Shilajit
+              </Link>
+            </div>
+          </Reveal>
+          <div className="-mx-4 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+            {shilajit.slice(0, 6).map((product) => (
+              <div
+                key={product.id}
+                className="w-56 shrink-0 snap-start sm:w-64"
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
