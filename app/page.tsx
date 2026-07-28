@@ -5,7 +5,10 @@ import {
   Flask,
   ChatCircleText,
   Medal,
+  ShieldCheck,
 } from "@phosphor-icons/react/dist/ssr";
+import { formatPrice } from "@/lib/format";
+import { AddToCartButton } from "@/components/add-to-cart-button";
 import { getProducts } from "@/lib/woo";
 import { posts } from "@/lib/posts";
 import { ProductCard } from "@/components/product-card";
@@ -98,13 +101,17 @@ export default async function HomePage() {
     )
     .slice(0, 8);
   const latestPosts = posts.slice(0, 3);
+  const heroProduct =
+    products.find(
+      (p) => p.slug === "organic-himalayan-shilajit-20g" && p.images.length > 0,
+    ) ?? shilajit.find((p) => p.inStock);
 
   return (
     <>
       <JsonLd data={faqSchema(HOME_FAQS)} />
 
       {/* Full-bleed hero */}
-      <section className="relative flex min-h-[92dvh] items-end">
+      <section className="relative flex min-h-[86dvh] items-center">
         <Image
           src={IMAGES.heroOcean}
           alt="The Atlantic ocean off Ireland's west coast"
@@ -113,34 +120,85 @@ export default async function HomePage() {
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-pine-950/90 via-pine-950/35 to-pine-950/20" />
-        <div className="relative mx-auto w-full max-w-7xl px-4 pb-16 pt-32 sm:px-6 lg:pb-24">
-          <div className="hero-enter max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-pine-200">
-              Ireland&apos;s shilajit specialists
-            </p>
-            <h1 className="mt-4 text-5xl font-bold leading-[1.02] tracking-tight text-bone-50 md:text-7xl">
-              Wellness that actually works
-            </h1>
-            <p className="mt-5 max-w-md text-lg leading-relaxed text-bone-100/90">
-              Lab-tested shilajit and premium supplements, shipped tracked from
-              Sligo in 2 to 3 days.
-            </p>
+        <div className="absolute inset-0 bg-gradient-to-r from-pine-950/85 via-pine-950/50 to-pine-950/30" />
+        <div className="relative mx-auto grid w-full max-w-7xl items-center gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[1.25fr_1fr]">
+          <div>
+            <div className="hero-enter">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-pine-200">
+                Ireland&apos;s shilajit specialists
+              </p>
+              <h1 className="mt-4 text-5xl font-bold leading-[1.02] tracking-tight text-bone-50 md:text-7xl">
+                Wellness that actually works
+              </h1>
+              <p className="mt-5 max-w-md text-lg leading-relaxed text-bone-100/90">
+                Lab-tested shilajit and premium supplements, shipped tracked
+                from Sligo in 2 to 3 days.
+              </p>
+            </div>
+            <div className="hero-enter-late">
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <Link
+                  href="/shop"
+                  className="rounded-full bg-bone-50 px-8 py-4 text-sm font-semibold text-pine-900 transition-all hover:bg-bone-100 active:scale-[0.98]"
+                >
+                  Shop now
+                </Link>
+                <Link
+                  href="/product-category/shilajit"
+                  className="rounded-full border border-bone-50/60 px-8 py-4 text-sm font-semibold text-bone-50 backdrop-blur-sm transition-colors hover:bg-bone-50/10"
+                >
+                  Explore Shilajit
+                </Link>
+              </div>
+              <ul className="mt-8 flex flex-wrap gap-x-7 gap-y-3 text-sm text-bone-100/85">
+                <li className="flex items-center gap-2">
+                  <Truck size={17} className="text-pine-200" /> Free delivery
+                  over €50
+                </li>
+                <li className="flex items-center gap-2">
+                  <Flask size={17} className="text-pine-200" /> Lab-tested
+                  batches
+                </li>
+                <li className="flex items-center gap-2">
+                  <ShieldCheck size={17} className="text-pine-200" /> Secure
+                  checkout
+                </li>
+              </ul>
+            </div>
           </div>
-          <div className="hero-enter-late mt-8 flex flex-wrap items-center gap-4">
-            <Link
-              href="/shop"
-              className="rounded-full bg-bone-50 px-8 py-4 text-sm font-semibold text-pine-900 transition-all hover:bg-bone-100 active:scale-[0.98]"
-            >
-              Shop now
-            </Link>
-            <Link
-              href="/product-category/shilajit"
-              className="rounded-full border border-bone-50/60 px-8 py-4 text-sm font-semibold text-bone-50 backdrop-blur-sm transition-colors hover:bg-bone-50/10"
-            >
-              Explore Shilajit
-            </Link>
-          </div>
+
+          {heroProduct && (
+            <div className="hero-enter-late hidden lg:block">
+              <div className="ml-auto w-full max-w-sm rounded-card border border-bone-50/20 bg-bone-50/95 p-6 shadow-2xl backdrop-blur">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-pine-600">
+                  Customer favourite
+                </p>
+                <Link
+                  href={`/product/${heroProduct.slug}`}
+                  className="group mt-4 block"
+                >
+                  <div className="relative aspect-square overflow-hidden rounded-xl bg-bone-100">
+                    <Image
+                      src={heroProduct.images[0].src}
+                      alt={heroProduct.name}
+                      fill
+                      sizes="384px"
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                    />
+                  </div>
+                  <p className="mt-4 font-semibold leading-snug transition-colors group-hover:text-pine-700">
+                    {heroProduct.name}
+                  </p>
+                </Link>
+                <div className="mt-2 flex items-center justify-between gap-4">
+                  <p className="text-lg font-semibold text-pine-800">
+                    {formatPrice(heroProduct.price)}
+                  </p>
+                  <AddToCartButton product={heroProduct} size="sm" />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
