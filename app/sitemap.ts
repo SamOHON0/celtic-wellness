@@ -28,8 +28,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     { url: `${SITE_URL}/terms`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/privacy`, changeFrequency: "yearly", priority: 0.3 },
+    // Category URLs use the nested parent/child shape the old site indexed,
+    // matching the canonicals set in the category page metadata.
     ...categories.map((c) => ({
-      url: `${SITE_URL}/product-category/${c.slug}`,
+      url: c.parent
+        ? `${SITE_URL}/product-category/${c.parent}/${c.slug}`
+        : `${SITE_URL}/product-category/${c.slug}`,
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),
