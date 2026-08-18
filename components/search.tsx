@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { MagnifyingGlass, X } from "@phosphor-icons/react";
@@ -14,8 +15,12 @@ import { formatPrice } from "@/lib/format";
 export function Search({ index }: { index: SearchItem[] }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  // Portal target only exists client-side.
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
@@ -60,7 +65,11 @@ export function Search({ index }: { index: SearchItem[] }) {
         <MagnifyingGlass size={22} />
       </button>
 
-      {open && (
+      {/* Portalled to <body>: the header's backdrop-blur creates a containing
+          block that would otherwise trap this fixed overlay inside the bar. */}
+      {mounted &&
+        open &&
+        createPortal(
         <div className="fixed inset-0 z-50">
           <button
             aria-label="Close search"
@@ -134,7 +143,8 @@ export function Search({ index }: { index: SearchItem[] }) {
               </ul>
             )}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
