@@ -1,5 +1,6 @@
 import { WOO_URL } from "./config";
-import type { Product, Category } from "./types";
+import type { Product, Category, Variation } from "./types";
+import { COPY_OVERRIDES } from "./copy-overrides";
 import fallback from "@/data/catalog.json";
 
 /**
@@ -23,6 +24,15 @@ type StoreApiProduct = {
   images: { src: string; thumbnail: string }[];
   categories: { name: string; slug: string }[];
   is_in_stock: boolean;
+  attributes?: {
+    name: string;
+    has_variations: boolean;
+    terms: { name: string; slug: string }[];
+  }[];
+  variations?: {
+    id: number;
+    attributes: { name: string; value: string }[];
+  }[];
 };
 
 function decode(text: string): string {
@@ -62,6 +72,19 @@ function normalize(p: StoreApiProduct): Product {
       slug: c.slug,
     })),
     inStock: p.is_in_stock,
+    attributes: (p.attributes ?? [])
+      .filter((a) => a.has_variations)
+      .map((a) => ({
+        name: a.name,
+        terms: (a.terms ?? []).map((t) => ({ name: t.name, slug: t.slug })),
+      })),
+    variationRefs: (p.variations ?? []).map((v) => ({
+      id: v.id,
+      attributes: (v.attributes ?? []).map((a) => ({
+        name: a.name,
+        value: a.value,
+      })),
+    })),
   };
 }
 
@@ -84,10 +107,22 @@ async function fetchLiveProducts(): Promise<Product[] | null> {
   }
 }
 
+/** Frontend copy overrides win over whatever WordPress currently holds. */
+function applyCopyOverride(p: Product): Product {
+  const override = COPY_OVERRIDES[p.id];
+  if (!override) return p;
+  return {
+    ...p,
+    shortDescription: override.shortDescription,
+    description: override.description,
+  };
+}
+
 export async function getProducts(): Promise<Product[]> {
   const live = await fetchLiveProducts();
-  if (live && live.length > 0) return live;
-  return fallback.products as Product[];
+  const products =
+    live && live.length > 0 ? live : (fallback.products as Product[]);
+  return products.map(applyCopyOverride);
 }
 
 export async function getProduct(slug: string): Promise<Product | undefined> {
@@ -128,4 +163,48 @@ export async function getCategories(): Promise<Category[]> {
 export async function getProductsByCategory(slug: string): Promise<Product[]> {
   const products = await getProducts();
   return products.filter((p) => p.categories.some((c) => c.slug === slug));
+}
+
+const MAX_VARIATIONS = 25;
+
+/**
+ * Resolves a variable product's variations (price, stock, image) by fetching
+ * each variation the parent lists. Returns null when live data is unavailable
+ * so callers can fall back to linking the Woo-hosted product page.
+ */
+export async function getVariations(
+  product: Product,
+): Promise<Variation[] | null> {
+  const refs = (product.variationRefs ?? []).slice(0, MAX_VARIATIONS);
+  if (refs.length === 0) return null;
+  try {
+    const results = await Promise.all(
+      refs.map(async (ref) => {
+        const res = await fetch(
+          `${WOO_URL}/wp-json/wc/store/v1/products/${ref.id}`,
+          { next: { revalidate: REVALIDATE } },
+        );
+        if (!res.ok) return null;
+        const raw = (await res.json()) as StoreApiProduct;
+        const image = (raw.images ?? [])[0];
+        const variation: Variation = {
+          id: ref.id,
+          attributes: ref.attributes,
+          price: raw.prices.price,
+          regularPrice: raw.prices.regular_price,
+          salePrice: raw.prices.sale_price,
+          onSale: raw.on_sale,
+          inStock: raw.is_in_stock,
+          image: image
+            ? { src: image.src, thumbnail: image.thumbnail ?? image.src }
+            : undefined,
+        };
+        return variation;
+      }),
+    );
+    const variations = results.filter((v): v is Variation => v !== null);
+    return variations.length > 0 ? variations : null;
+  } catch {
+    return null;
+  }
 }

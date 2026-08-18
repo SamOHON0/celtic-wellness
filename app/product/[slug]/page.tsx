@@ -3,9 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Truck, ShieldCheck, ArrowLeft } from "@phosphor-icons/react/dist/ssr";
-import { getProduct, getProductsByCategory } from "@/lib/woo";
+import { getProduct, getProductsByCategory, getVariations } from "@/lib/woo";
 import { formatPrice } from "@/lib/format";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { VariationPicker } from "@/components/variation-picker";
 import { ProductCard } from "@/components/product-card";
 import { ProductGallery } from "@/components/product-gallery";
 import { JsonLd } from "@/components/json-ld";
@@ -30,6 +31,14 @@ export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
   const product = await getProduct(slug);
   if (!product) notFound();
+
+  // Variable products: resolve variations live so options can be picked here.
+  // When that fails (offline build, API change) the AddToCartButton falls back
+  // to linking the Woo-hosted product page instead.
+  const variations =
+    product.type === "variable" && (product.attributes?.length ?? 0) > 0
+      ? await getVariations(product)
+      : null;
 
   const primaryCategory = product.categories[0];
   const related = primaryCategory
@@ -79,26 +88,41 @@ export default async function ProductPage({ params }: Props) {
             {product.name}
           </h1>
 
-          <div className="mt-4 flex items-baseline gap-3">
-            <p className="text-2xl font-semibold text-pine-800">
-              {formatPrice(product.price)}
-            </p>
-            {product.onSale && (
-              <p className="text-lg text-ink-soft line-through">
-                {formatPrice(product.regularPrice)}
-              </p>
-            )}
-          </div>
+          {variations ? (
+            <>
+              {product.shortDescription && (
+                <p className="mt-5 leading-relaxed text-ink-soft">
+                  {product.shortDescription}
+                </p>
+              )}
+              <div className="mt-4">
+                <VariationPicker product={product} variations={variations} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="mt-4 flex items-baseline gap-3">
+                <p className="text-2xl font-semibold text-pine-800">
+                  {formatPrice(product.price)}
+                </p>
+                {product.onSale && (
+                  <p className="text-lg text-ink-soft line-through">
+                    {formatPrice(product.regularPrice)}
+                  </p>
+                )}
+              </div>
 
-          {product.shortDescription && (
-            <p className="mt-5 leading-relaxed text-ink-soft">
-              {product.shortDescription}
-            </p>
+              {product.shortDescription && (
+                <p className="mt-5 leading-relaxed text-ink-soft">
+                  {product.shortDescription}
+                </p>
+              )}
+
+              <div className="mt-8 max-w-sm">
+                <AddToCartButton product={product} />
+              </div>
+            </>
           )}
-
-          <div className="mt-8 max-w-sm">
-            <AddToCartButton product={product} />
-          </div>
 
           <div className="mt-8 space-y-3 border-t border-bone-200 pt-6 text-sm text-ink-soft">
             <p className="flex items-center gap-2.5">

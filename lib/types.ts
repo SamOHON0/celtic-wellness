@@ -8,6 +8,35 @@ export type ProductCategoryRef = {
   slug: string;
 };
 
+export type AttributeTerm = {
+  name: string;
+  slug: string;
+};
+
+/** A variation-defining attribute on a variable product, e.g. "Types". */
+export type ProductAttribute = {
+  name: string;
+  terms: AttributeTerm[];
+};
+
+/** Lightweight pointer from a variable product to one of its variations. */
+export type VariationRef = {
+  id: number;
+  attributes: { name: string; value: string }[];
+};
+
+/** A fully resolved variation (fetched separately from the Store API). */
+export type Variation = {
+  id: number;
+  attributes: { name: string; value: string }[];
+  price: string; // minor units
+  regularPrice: string;
+  salePrice: string;
+  onSale: boolean;
+  inStock: boolean;
+  image?: ProductImage;
+};
+
 export type Product = {
   id: number;
   name: string;
@@ -23,6 +52,19 @@ export type Product = {
   images: ProductImage[];
   categories: ProductCategoryRef[];
   inStock: boolean;
+  /** Present on variable products when live data is available. */
+  attributes?: ProductAttribute[];
+  variationRefs?: VariationRef[];
+};
+
+/** Slim product shape serialized into the page for client-side search. */
+export type SearchItem = {
+  id: number;
+  name: string;
+  slug: string;
+  price: string;
+  image: string;
+  category: string;
 };
 
 export type Category = {

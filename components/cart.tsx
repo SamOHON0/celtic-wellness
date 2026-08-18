@@ -15,12 +15,13 @@ import { WOO_URL, FREE_DELIVERY_THRESHOLD } from "@/lib/config";
 import { formatPrice } from "@/lib/format";
 
 export type CartItem = {
-  id: number;
+  id: number; // product ID, or variation ID for variable products
   name: string;
   slug: string;
   price: string; // minor units
   image: string;
   qty: number;
+  variant?: string; // e.g. "Calm", shown under the name in the drawer
 };
 
 type CartContextValue = {
@@ -206,6 +207,11 @@ export function CartDrawer() {
                     <p className="text-sm font-medium leading-snug">
                       {item.name}
                     </p>
+                    {item.variant && (
+                      <p className="mt-0.5 text-xs text-ink-soft">
+                        {item.variant}
+                      </p>
+                    )}
                     <p className="mt-1 text-sm text-ink-soft">
                       {formatPrice(item.price)}
                     </p>

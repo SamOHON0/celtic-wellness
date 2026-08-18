@@ -6,6 +6,8 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
 import { organizationSchema } from "@/lib/schema";
+import { getProducts } from "@/lib/woo";
+import type { SearchItem } from "@/lib/types";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://celticwellness.ie"),
@@ -22,17 +24,30 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Slim index for client-side search; ~56 products keeps this tiny.
+  const searchIndex: SearchItem[] = (await getProducts()).map((p) => ({
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    price: p.price,
+    image: p.images[0]?.thumbnail ?? "",
+    category:
+      p.categories.find((c) => c.slug !== "wellness-supplements")?.name ??
+      p.categories[0]?.name ??
+      "",
+  }));
+
   return (
     <html lang="en">
       <body>
         <JsonLd data={organizationSchema()} />
         <CartProvider>
-          <Header />
+          <Header searchIndex={searchIndex} />
           <main>{children}</main>
           <Footer />
           <CartDrawer />

@@ -6,7 +6,9 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { List, X, Tote, User } from "@phosphor-icons/react";
 import { useCart } from "./cart";
+import { Search } from "./search";
 import { WOO_URL } from "@/lib/config";
+import type { SearchItem } from "@/lib/types";
 
 const NAV = [
   { label: "Shop All", href: "/shop" },
@@ -18,7 +20,7 @@ const NAV = [
   { label: "About", href: "/about" },
 ];
 
-export function Header() {
+export function Header({ searchIndex = [] }: { searchIndex?: SearchItem[] }) {
   const cart = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
@@ -55,6 +57,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <Search index={searchIndex} />
           <a
             href={`${WOO_URL}/my-account/`}
             aria-label="My account"
