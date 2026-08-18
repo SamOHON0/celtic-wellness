@@ -28,6 +28,29 @@ function stripHtml(html) {
     .trim();
 }
 
+// Mirrors lib/sanitize.ts so offline fallback keeps spec tables and lists.
+const ALLOWED = new Set(["p","br","strong","b","em","i","ul","ol","li","h3","h4","table","thead","tbody","tr","th","td"]);
+const HEADING_MAP = { h1: "h3", h2: "h3", h5: "h4", h6: "h4" };
+
+function sanitizeHtml(html) {
+  return html
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<(script|style|iframe|svg|noscript)\b[\s\S]*?<\/\1>/gi, "")
+    .replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g, (match, rawTag) => {
+      const tag = HEADING_MAP[rawTag.toLowerCase()] ?? rawTag.toLowerCase();
+      if (!ALLOWED.has(tag)) return " ";
+      if (tag === "br") return "<br />";
+      return match.startsWith("</") ? `</${tag}>` : `<${tag}>`;
+    })
+    .replace(/(\s*<br \/>\s*){3,}/g, "<br /><br />")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function isEmptyHtml(html) {
+  return html.replace(/<[^>]+>/g, "").trim().length === 0;
+}
+
 function normalize(p) {
   return {
     id: p.id,
@@ -41,6 +64,10 @@ function normalize(p) {
     sku: p.sku ?? "",
     shortDescription: stripHtml(p.short_description ?? ""),
     description: stripHtml(p.description ?? ""),
+    descriptionHtml: (() => {
+      const clean = sanitizeHtml(decode(p.description ?? ""));
+      return isEmptyHtml(clean) ? undefined : clean;
+    })(),
     images: (p.images ?? []).slice(0, 4).map((i) => ({
       src: i.src,
       thumbnail: i.thumbnail ?? i.src,
@@ -52,6 +79,12 @@ function normalize(p) {
     inStock: p.is_in_stock,
     attributes: (p.attributes ?? [])
       .filter((a) => a.has_variations)
+      .map((a) => ({
+        name: a.name,
+        terms: (a.terms ?? []).map((t) => ({ name: t.name, slug: t.slug })),
+      })),
+    infoAttributes: (p.attributes ?? [])
+      .filter((a) => !a.has_variations && (a.terms ?? []).length > 0)
       .map((a) => ({
         name: a.name,
         terms: (a.terms ?? []).map((t) => ({ name: t.name, slug: t.slug })),

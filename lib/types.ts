@@ -52,9 +52,20 @@ export type Product = {
   images: ProductImage[];
   categories: ProductCategoryRef[];
   inStock: boolean;
+  /**
+   * Sanitized description HTML preserving the original structure: spec
+   * tables, measurement lists, headings. Absent on stale fallback snapshots,
+   * in which case the PDP falls back to the plain-text description.
+   */
+  descriptionHtml?: string;
   /** Present on variable products when live data is available. */
   attributes?: ProductAttribute[];
   variationRefs?: VariationRef[];
+  /**
+   * Non-variation attributes (e.g. Colour options, materials), mirroring the
+   * old site's "Additional information" tab.
+   */
+  infoAttributes?: ProductAttribute[];
 };
 
 /** Slim product shape serialized into the page for client-side search. */

@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: product.name,
     description: product.shortDescription.slice(0, 160),
+    alternates: { canonical: `/product/${product.slug}` },
     openGraph: { images: product.images[0] ? [product.images[0].src] : [] },
   };
 }
@@ -135,7 +136,18 @@ export default async function ProductPage({ params }: Props) {
             </p>
           </div>
 
-          {product.description &&
+          {product.descriptionHtml ? (
+            <div className="mt-8 border-t border-bone-200 pt-6">
+              <h2 className="font-semibold">About this product</h2>
+              <div
+                className="product-prose mt-3 text-sm leading-relaxed text-ink-soft"
+                // Sanitized in lib/sanitize.ts: allowlisted tags only, all
+                // attributes stripped.
+                dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
+              />
+            </div>
+          ) : (
+            product.description &&
             product.description !== product.shortDescription && (
               <div className="mt-8 border-t border-bone-200 pt-6">
                 <h2 className="font-semibold">About this product</h2>
@@ -143,7 +155,26 @@ export default async function ProductPage({ params }: Props) {
                   {product.description}
                 </p>
               </div>
-            )}
+            )
+          )}
+
+          {(product.infoAttributes?.length ?? 0) > 0 && (
+            <div className="mt-8 border-t border-bone-200 pt-6">
+              <h2 className="font-semibold">Additional information</h2>
+              <table className="mt-3 w-full text-sm">
+                <tbody>
+                  {product.infoAttributes!.map((attr) => (
+                    <tr key={attr.name} className="border-b border-bone-200">
+                      <td className="py-2 pr-4 font-medium">{attr.name}</td>
+                      <td className="py-2 text-ink-soft">
+                        {attr.terms.map((t) => t.name).join(", ")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
 

@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Shop All",
   description:
     "Browse the full Celtic Wellness range: supplements, Shilajit, water treatment, recovery equipment and more.",
+  alternates: { canonical: "/shop" },
 };
 
 export default async function ShopPage() {

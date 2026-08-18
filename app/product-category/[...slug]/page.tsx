@@ -22,6 +22,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: category
       ? `Shop ${category.name} at Celtic Wellness with fast tracked delivery across Ireland.`
       : undefined,
+    // Nested and flat paths both resolve; canonicalize to the same shape the
+    // old WordPress site indexed (parent/child) so link equity consolidates.
+    alternates: category
+      ? {
+          canonical: category.parent
+            ? `/product-category/${category.parent}/${category.slug}`
+            : `/product-category/${category.slug}`,
+        }
+      : undefined,
   };
 }
 

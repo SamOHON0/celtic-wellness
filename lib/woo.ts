@@ -1,6 +1,7 @@
 import { WOO_URL } from "./config";
 import type { Product, Category, Variation } from "./types";
 import { COPY_OVERRIDES } from "./copy-overrides";
+import { sanitizeHtml, isEmptyHtml, textToHtml } from "./sanitize";
 import fallback from "@/data/catalog.json";
 
 /**
@@ -63,6 +64,10 @@ function normalize(p: StoreApiProduct): Product {
     sku: p.sku ?? "",
     shortDescription: stripHtml(p.short_description ?? ""),
     description: stripHtml(p.description ?? ""),
+    descriptionHtml: (() => {
+      const clean = sanitizeHtml(decode(p.description ?? ""));
+      return isEmptyHtml(clean) ? undefined : clean;
+    })(),
     images: (p.images ?? []).slice(0, 4).map((i) => ({
       src: i.src,
       thumbnail: i.thumbnail ?? i.src,
@@ -74,6 +79,12 @@ function normalize(p: StoreApiProduct): Product {
     inStock: p.is_in_stock,
     attributes: (p.attributes ?? [])
       .filter((a) => a.has_variations)
+      .map((a) => ({
+        name: a.name,
+        terms: (a.terms ?? []).map((t) => ({ name: t.name, slug: t.slug })),
+      })),
+    infoAttributes: (p.attributes ?? [])
+      .filter((a) => !a.has_variations && (a.terms ?? []).length > 0)
       .map((a) => ({
         name: a.name,
         terms: (a.terms ?? []).map((t) => ({ name: t.name, slug: t.slug })),
@@ -114,7 +125,8 @@ function applyCopyOverride(p: Product): Product {
   return {
     ...p,
     shortDescription: override.shortDescription,
-    description: override.description,
+    description: override.description.replace(/\n+/g, " "),
+    descriptionHtml: textToHtml(override.description),
   };
 }
 
