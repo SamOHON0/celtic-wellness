@@ -11,17 +11,17 @@ const SHOP_LINKS = [
 ];
 
 const HELP_LINKS = [
-  { label: "My Account", href: `${WOO_URL}/my-account/` },
-  { label: "Contact Us", href: `${WOO_URL}/contact/` },
-  { label: "Delivery Information", href: `${WOO_URL}/delivery-information/` },
-  { label: "Returns Policy", href: `${WOO_URL}/refund-returns/` },
+  { label: "My Account", href: "/account" },
+  { label: "Contact Us", href: "/contact" },
+  { label: "Delivery Information", href: "/delivery-information" },
+  { label: "Returns Policy", href: "/refund-returns" },
   { label: "Track My Order", href: `${WOO_URL}/order-tracking/` },
   { label: "Wholesale", href: `${WOO_URL}/wholesale/` },
 ];
 
 const LEGAL_LINKS = [
-  { label: "Terms & Conditions", href: `${WOO_URL}/terms/` },
-  { label: "Privacy Policy", href: `${WOO_URL}/privacy/` },
+  { label: "Terms & Conditions", href: "/terms" },
+  { label: "Privacy Policy", href: "/privacy" },
   { label: "Cookie Policy", href: `${WOO_URL}/cookies/` },
 ];
 

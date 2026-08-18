@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import { List, X, Tote, User } from "@phosphor-icons/react";
 import { useCart } from "./cart";
 import { Search } from "./search";
-import { WOO_URL } from "@/lib/config";
 import type { SearchItem } from "@/lib/types";
 
 const NAV = [
@@ -58,13 +57,13 @@ export function Header({ searchIndex = [] }: { searchIndex?: SearchItem[] }) {
 
         <div className="flex items-center gap-2">
           <Search index={searchIndex} />
-          <a
-            href={`${WOO_URL}/my-account/`}
+          <Link
+            href="/account"
             aria-label="My account"
             className="hidden rounded-full p-2.5 transition-colors hover:bg-bone-200 sm:block"
           >
             <User size={22} />
-          </a>
+          </Link>
           <button
             onClick={cart.open}
             aria-label="Open cart"
@@ -99,12 +98,13 @@ export function Header({ searchIndex = [] }: { searchIndex?: SearchItem[] }) {
               {item.label}
             </Link>
           ))}
-          <a
-            href={`${WOO_URL}/my-account/`}
+          <Link
+            href="/account"
+            onClick={() => setMobileOpen(false)}
             className="block rounded-lg px-2 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-bone-100"
           >
             My Account
-          </a>
+          </Link>
         </nav>
       )}
     </header>

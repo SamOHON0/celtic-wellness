@@ -12,18 +12,14 @@ const WOO_URL = process.env.NEXT_PUBLIC_WOO_URL;
  * means a misconfigured deploy can never redirect celticwellness.ie/checkout
  * to itself in a loop.
  */
+// Contact, delivery, returns, terms, privacy and my-account are now built
+// natively; only genuinely WordPress-hosted pages remain here.
 const WP_PAGES = [
   "/cart",
   "/checkout",
-  "/my-account",
   "/order-tracking",
   "/orders-tracking",
-  "/contact",
   "/wholesale",
-  "/delivery-information",
-  "/refund-returns",
-  "/terms",
-  "/privacy",
   "/cookies",
   "/discount-codes",
 ];
@@ -59,6 +55,12 @@ const nextConfig: NextConfig = {
         source: "/product-category/uncategorized",
         destination: "/shop",
         permanent: true,
+      },
+      // Old Woo account URL -> native account area
+      {
+        source: "/my-account",
+        destination: "/account",
+        permanent: false,
       },
     ];
 
