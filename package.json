@@ -12,8 +12,8 @@
     "@fontsource-variable/outfit": "^5.2.5",
     "@phosphor-icons/react": "^2.1.7",
     "next": "^15.3.3",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.8",
